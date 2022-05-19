@@ -1,0 +1,27 @@
+{% extends 'AppFinal/padre.html' %}
+{% load static %}
+{% block contenidoQueCambia %}
+
+<h3>Usuarios encontrados</h3>
+
+
+{% if usuarios %}
+
+    {% for user in usuarios %}
+
+        <p> {{user.nombre}} {{user.apellido}}</p>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No hay usuarios con ese apellido</p>
+
+{% endif %}
+
+{% endblock %}
+{% block titulo %}
+
+    <h1> Buscando usuarios </h1>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "AppFinal/padre.html" %}
+
+{% load static %}
+
+{% block contenidoQueCambia %}
+
+<h1>Datos de la mascota perdida</h1>
+
+<form action="{% url 'datos' %}" method="POST"> {% csrf_token %}
+
+
+    <table>
+        {{formulariodatos.as_table}}    
+    </table>
+
+    
+    <input type="submit" value="ENVIAR">
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "AppFinal/padre.html" %}
+{% load static %}
+{% block contenidoQueCambia %}
+
+<h3>Busqueda de usuario</h3>
+
+<form action="{% url 'buscarUsuario' %}" method="GET">
+    <p><input type="text" placeholder="Apellido de Usuario" name="apellido" ></p>
+    <p><input type="submit" value="Buscar"></p>
+
+</form>
+
+{% if respuesta %}
+
+    <p style="color: red;">{{respuesta}}</p>
+
+{% endif %}
+
+{% endblock %}
+{% block titulo %}
+
+    <h1> buscando cursos </h1>
+
+{% endblock %}
