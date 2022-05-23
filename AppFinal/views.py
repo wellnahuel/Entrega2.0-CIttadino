@@ -3,12 +3,17 @@ from turtle import color
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from AppFinal.forms import UsuarioForm, AnimalForm, DatosForm
+from AppFinal.forms import UsuarioForm, AnimalForm, DatosForm, UserRegistrationForm
 
 from .models import *
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def usuario(request):
@@ -92,6 +97,7 @@ def eliminarUsuario(request, nombre):
 
     return render(request, 'AppFinal/leerUsuarios.html', contexto)
 
+
 def editarUsuario(request, nombre):
     usuario=Usuario.objects.get(nombre=nombre)
     if request.method == 'POST':
@@ -115,31 +121,69 @@ def editarUsuario(request, nombre):
     
 #---------------------------------------------------------------------
 
-class AnimalesList(ListView):
+class AnimalesList(LoginRequiredMixin, ListView):
     model = Animal
     template_name = 'AppFinal/animal.html'
 
-class AnimalDetalle(DetailView):
+class AnimalDetalle(LoginRequiredMixin, DetailView):
     model = Animal
     template_name = 'AppFinal/animalDetalle.html'
 
-class AnimalCreacion(CreateView):
+class AnimalCreacion(LoginRequiredMixin, CreateView):
     model = Animal
     success_url = reverse_lazy('animal_listar')
     fields = ['raza', 'color']
 
-class AnimalEdicion(UpdateView):
+class AnimalEdicion(LoginRequiredMixin, UpdateView):
     model = Animal
     success_url = reverse_lazy('animal_listar')
     fields = ['raza', 'color']
 
-class AnimalEliminacion(DeleteView):
+class AnimalEliminacion(LoginRequiredMixin, DeleteView):
     model = Animal
     success_url = reverse_lazy('animal_listar')
     fields = ['raza', 'color']
 
 
+#------------------------LOGIN-------------------------------
 
 
+def login_request(request):
+    if request.method == 'POST':
+        formulario = AuthenticationForm(request, data=request.POST)
+        if formulario.is_valid():
+            usuario=formulario.cleaned_data.get('username')
+            clave=formulario.cleaned_data.get('password')
 
+            user=authenticate(username=usuario, password=clave)
+
+            if user is not None:
+                login(request, user)
+                return render(request, 'AppFinal/inicio.html', {'usuario':usuario, 'mensaje':'Bienvenido al sistema'})
+
+            else: 
+                return render(request, 'AppFinal/inicio.html', {'mensaje':'USUARIO INCORRECTO'})
+        else:
+            return render(request, 'AppFinal/inicio.html', {'mensaje':'FORMULARIO INVALIDO'})
+    else:
+        formulario=AuthenticationForm()
+        return render(request, 'AppFinal/login.html', {'formulario':formulario})
+
+#----------------------------Register----------------------
+
+def register(request):
+    if request.method == 'POST':
+        formulario = UserRegistrationForm(request.POST)
+        if formulario.is_valid():
+            username=formulario.cleaned_data['username']
+            formulario.save()
+            return render(request, 'AppFinal/inicio.html', {'mensaje': f'Usuario: {username} Creado exitosamente'})
+        else: 
+            return render(request, 'AppFinal/inicio.html', {'mensaje':'No se pudo crear el usuario'})
+    else:
+        formulario=UserRegistrationForm()
+        return render(request, 'AppFinal/register.html', {'formulario':formulario})
+
+
+#-------------------------Logout-------------------------
 
