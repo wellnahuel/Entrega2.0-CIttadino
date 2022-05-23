@@ -1,3 +1,4 @@
+from dataclasses import fields
 from turtle import color
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -5,6 +6,9 @@ from django.shortcuts import render
 from AppFinal.forms import UsuarioForm, AnimalForm, DatosForm
 
 from .models import *
+
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 
 # Create your views here.
 def usuario(request):
@@ -77,7 +81,65 @@ def buscarUsuario(request):
 def leerUsuarios(request):
     usuarios = Usuario.objects.all() #trae todos los usuarios
     contexto = {"usuarios":usuarios}
-    return render(request, "AppFinal/leerUsuarios.html")
+    print(contexto)
+    return render(request, "AppFinal/leerUsuarios.html", contexto)
+
+def eliminarUsuario(request, nombre):
+    usuario=Usuario.objects.get(nombre=nombre)
+    usuario.delete()
+    usuarios=Usuario.objects.all()
+    contexto={'usuarios':usuarios}
+
+    return render(request, 'AppFinal/leerUsuarios.html', contexto)
+
+def editarUsuario(request, nombre):
+    usuario=Usuario.objects.get(nombre=nombre)
+    if request.method == 'POST':
+        formulario=UsuarioForm(request.POST)
+        if formulario.is_valid():
+            informacion=formulario.cleaned_data
+            usuario.nombre=informacion['nombre']
+            usuario.apellido=informacion['apellido']
+            usuario.email=informacion['email']
+            usuario.celular=informacion['celular']
+            usuario.save()
+            #luego muestro la listade usuarios de nuevo
+            usuarios=Usuario.objects.all()
+            contexto={'usuarios':usuarios}
+
+            return render(request, 'AppFinal/leerUsuarios.html', contexto)
+
+    else:
+        formulario=UsuarioForm(initial={'nombre':usuario.nombre, 'apellido':usuario.apellido, 'email':usuario.email, 'celular':usuario.celular})
+        return render(request, 'AppFinal/editarUsuario.html', {'formulario':formulario, 'nombre':nombre})
+    
+#---------------------------------------------------------------------
+
+class AnimalesList(ListView):
+    model = Animal
+    template_name = 'AppFinal/animal.html'
+
+class AnimalDetalle(DetailView):
+    model = Animal
+    template_name = 'AppFinal/animalDetalle.html'
+
+class AnimalCreacion(CreateView):
+    model = Animal
+    success_url = reverse_lazy('animal_listar')
+    fields = ['raza', 'color']
+
+class AnimalEdicion(UpdateView):
+    model = Animal
+    success_url = reverse_lazy('animal_listar')
+    fields = ['raza', 'color']
+
+class AnimalEliminacion(DeleteView):
+    model = Animal
+    success_url = reverse_lazy('animal_listar')
+    fields = ['raza', 'color']
+
+
+
 
 
 

@@ -20,6 +20,10 @@
 
 {% endfor %}
 
+<p>
+    <a href="{% url 'animal_crear' %}">CREAR</a>
+</p>
+
 <h1>Animales perdidos</h1>
 
 <form action="{% url 'animal' %}" method="POST"> {% csrf_token %}

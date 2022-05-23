@@ -1,0 +1,21 @@
+{% extends "AppFinal/padre.html" %}
+
+{% load static %}
+
+{% block contenidoQueCambia %}
+
+<h1>Listado de Usuarios</h1>
+
+{% for usuario in usuarios %}
+
+ <li> {{ usuario.nombre }} </li> 
+<button>
+    <a href="{% url 'eliminarUsuario' usuario.nombre %}">Borrar Usuario</a>
+</button>
+<button>
+    <a href="{% url 'editarUsuario' usuario.nombre %}">Editar Usuario</a>
+</button>
+
+{% endfor %}
+
+{% endblock %}
