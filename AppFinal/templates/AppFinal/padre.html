@@ -30,9 +30,20 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'animal' %}">Animales perdidos</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'datos' %}">Datos</a></li>
 
-                        <li class="nav-item"><a class="nav-link" href="">Registrarse</a></li>
-                        <li class="nav-item"><a class="nav-link" href="">Ingresar</a></li>
+                       <!--  <li class="nav-item"><a class="nav-link" href="">Registrarse</a></li>
+                        <li class="nav-item"><a class="nav-link" href="">Ingresar</a></li> -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'inicio' %}">Inicio</a></li>
+
+                        {% if not request.user.is_authenticated %}
+                
+                        <li class="nav-item"><a class="btn btn-primary " href="{% url 'login' %}">ENTRAR</a></li>
+
+                        {% else %}
+
+                            <p>Hola {{user}}</p>
+                            <li class="nav-item"></li> <a class="btn btn-primary " href="{% url 'logout' %}">SALIR</a></li>
+
+                        {% endif %}
 
                     </ul>
                 </div>

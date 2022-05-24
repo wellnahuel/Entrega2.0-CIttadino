@@ -1,0 +1,28 @@
+{% extends "AppFinal/padre.html" %}
+
+{% load static %}
+
+{% block contenidoQueCambia %}
+
+<h1>Editando Perfil de {{usuario}}</h1>
+
+<form action="{% url 'editarPerfil' %}" method="POST"> {% csrf_token %}
+
+
+    <table>
+        {{formulario.as_table}}    
+    </table>
+
+    <!-- <p>Nombre: <input type="text" name="nombre" id="nombre"> </p>
+    <p>Apellido: <input type="text" name="apellido" id="apellido"> </p>
+    <p>E-mail: <input type="email" name="email" id="email"> </p>
+    <p>Celular: <input type="number" name="celular" id="celular"> </p> -->
+    <input type="submit" value="Guardar">
+
+{% endblock %}
+
+{% block titulo %}
+
+    <h1> Edicion de perfil </h1>
+
+{% endblock %}

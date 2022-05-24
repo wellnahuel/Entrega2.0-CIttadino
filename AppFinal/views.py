@@ -3,9 +3,9 @@ from turtle import color
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from AppFinal.forms import UsuarioForm, AnimalForm, DatosForm, UserRegistrationForm
+from AppFinal.forms import UsuarioForm, AnimalForm, DatosForm, UserRegistrationForm, UserEditForm, AvatarForm
 
-from .models import *
+from .models import Usuario, Animal, Datos, Avatar
 
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -14,6 +14,9 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
+
 
 # Create your views here.
 def usuario(request):
@@ -68,7 +71,9 @@ def datos(request):
     return render(request, "AppFinal/datos.html")
 
 def inicio(request):
-    return render(request, "AppFinal/inicio.html")
+
+    avatar=Avatar.objects.filter(user=request.user)
+    return render(request, "AppFinal/inicio.html", {'url': avatar[0].avatar.url})
 
 
 
@@ -186,4 +191,53 @@ def register(request):
 
 
 #-------------------------Logout-------------------------
+
+
+#----------------------------------------------------------
+
+def editarPerfil(request):
+    usuario=request.user
+
+    if request.method == 'POST':
+        formulario=UserEditForm(request.POST, instance=usuario)
+        if formulario.is_valid():
+            informacion=formulario.cleaned_data
+            usuario.email=informacion['email']
+            usuario.password1=informacion['password1']
+            usuario.password2=informacion['password2']
+            usuario.save()
+
+            return render(request, 'AppFinal/inicio.html', {'usuario':usuario, 'mensaje':'PERFIL EDITADO EXITOSAMENTE'})
+    else:
+        formulario=UserEditForm(instance=usuario)
+    return render(request, 'AppFinal/editarPerfil.html', {'formulario':formulario, 'usuario':usuario.username})
+
+#---------------------------------------------------------------------------
+
+def agregarAvatar(request):
+
+    user=User.objects.get(username=request.user)
+    if request.method == 'POST':
+        formulario=AvatarForm(request.POST, request.FILES)
+        if formulario.is_valid():
+
+            avatarViejo=Avatar.objects.get(user=request.user)
+            if(avatarViejo.avatar):
+                avatarViejo.delete()
+
+            avatar=Avatar(user=user, avatar=formulario.cleaned_data['avatar'])
+            avatar.save()
+            return render(request, 'AppFinal/inicio.html', {'usuario':user, 'mensaje':'AVATAR AGREGADO EXITOSAMENTE'})
+    else:
+        formulario=AvatarForm()
+    return render(request, 'AppFinal/agregarAvatar.html', {'formulario':formulario, 'usuario':user})
+
+
+
+
+
+
+
+
+
 
